@@ -1,11 +1,13 @@
 package Main;
 
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 public class Car extends Thread{
 	
-	boolean rodando = true;
-	
+	//quantidade de interações do gameloop
+	final int INTERACTION_FINAL = 50;
+	int interaction = 0;
 	
 	int id;
 	
@@ -19,11 +21,17 @@ public class Car extends Thread{
 	float S_Inicial;
 	float S_Final;
 	
+	//numeros aleatorios
 	Random r = new Random();
 	
-	public Car(int id)
+	Semaphore semaphore;
+	int[] ranking;
+	
+	public Car(int id, int ranking[])
 	{
 		this.id = id;
+		this.ranking = ranking;
+		this.semaphore = new Semaphore(1);
 	}
 	
 	public void run()
@@ -31,18 +39,40 @@ public class Car extends Thread{
 		float gameTime = 0;
 		
 		//GameLoop
-		while(rodando)
+		while(interaction < INTERACTION_FINAL)
 		{
+			
 			long inicio = System.currentTimeMillis();
 			
 			Update(gameTime);
 			
 			long fim = System.currentTimeMillis();
 			gameTime = (float)(fim - inicio)* 0.001f;
+			interaction++;
 			
 		}
 		
+		try {
+			semaphore.acquire();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 		
+		System.out.println("Carro_" + this.id + " alcançou a linha de chegada.");
+		
+		for(int i = 0; i<ranking.length; i++)
+		{
+			if(ranking[i] == -1)
+			{
+				ranking[i] = id;
+				break;
+			}
+		}
+		
+		
+		
+		semaphore.release();
 		
 	}
 	
@@ -60,14 +90,8 @@ public class Car extends Thread{
 		this.S_Final += this.S_Inicial;
 		
 		
-		System.out.println("O Carro_"+this.id+" andou "+ this.S_Inicial +"m e já percorreu "+ this.S_Final  +"m");
+		//System.out.println("O Carro_" + this.id + " andou " + this.S_Inicial + " m e já percorreu " + this.S_Final  + " m");
 		
-		if(this.S_Final >= 10f)
-		{
-			
-			rodando =false;
-			System.out.println("Carro_"+ this.id+" alcançou a linha de chegada.");
-		}
 		
 	}
 
