@@ -24,7 +24,7 @@ public class Car extends Thread{
 	//numeros aleatorios
 	Random r = new Random();
 	
-	Semaphore semaphore;
+	public static Semaphore semaphore;
 	int[] ranking;
 	
 	public Car(int id, int ranking[])
@@ -52,6 +52,7 @@ public class Car extends Thread{
 			
 		}
 		
+		
 		try {
 			semaphore.acquire();
 		} catch (Exception e)
@@ -59,7 +60,7 @@ public class Car extends Thread{
 			e.printStackTrace();
 		}
 		
-		System.out.println("Carro_" + this.id + " alcançou a linha de chegada.");
+		
 		
 		for(int i = 0; i<ranking.length; i++)
 		{
@@ -70,7 +71,7 @@ public class Car extends Thread{
 			}
 		}
 		
-		
+		System.out.println("Carro_" + this.id + " alcançou a linha de chegada.");
 		
 		semaphore.release();
 		
